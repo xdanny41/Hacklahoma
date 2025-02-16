@@ -122,7 +122,7 @@ const CompanyPage = () => {
   const stock = stockData[selectedSymbol];
 
   return (
-    <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+    <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '100vh', minWidth:'1800px' }}>
       <div className="row w-100">
         <div className="col-md-8 col-lg-6 mx-auto">
           {stock ? (

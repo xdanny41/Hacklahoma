@@ -150,19 +150,23 @@ router.put('/sell-position', authMiddleware, async (req, res) => {
   }
 });
 
-/*
-   (Optional) Get the current portfolio.
-   Endpoint: GET /api/portfolio
-*/
+// (Optional) Get the current portfolio.
+// Endpoint: GET /api/portfolio
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const portfolio = await Portfolio.findOne({ userId: req.user.userId });
+    let portfolio = await Portfolio.findOne({ userId: req.user.userId });
     if (!portfolio) {
-      return res.status(404).json({ error: 'Portfolio not found' });
+      // Create a new portfolio with a balance of $0 and no positions.
+      portfolio = new Portfolio({
+        userId: req.user.userId,
+        balance: 0,
+        positions: [],
+      });
+      await portfolio.save();
     }
     res.status(200).json(portfolio);
   } catch (error) {
-    console.error('Error fetching portfolio:', error);
+    console.error('Error fetching or creating portfolio:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

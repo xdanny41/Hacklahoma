@@ -10,6 +10,7 @@ import Portfolio from './HomePage/UserPortfolio';
 import CompanyPage from './HomePage/CompanyPage';
 import Navbar from './HomePage/navbar';
 import RegistrationPage from './HomePage/RegistrationPage';
+import LearningCenter from './HomePage/LearningCenter';
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
         <Route path="/post/:id" element={<PostThread />} />
 
         <Route path="/charts" element={<CompanyPage />} />
+
+        <Route path="/learning" element={<LearningCenter />} />
 
 
       </Routes>

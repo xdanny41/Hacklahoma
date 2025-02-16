@@ -27,7 +27,7 @@ function Navbar() {
             style={{ height: '55px', marginLeft:'-75px' }}
           />
         </Link>
-        <h1 style={{fontSize:'20px', marginTop:'10px', marginLeft:'-25px'}}>InvestMe</h1>
+        <h1 style={{fontSize:'20px', marginTop:'10px', marginLeft:'-25px', fontFamily: 'Lora'}}>InvestMe</h1>
         <button
           className="navbar-toggler"
           type="button"
@@ -42,36 +42,31 @@ function Navbar() {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
             {/* Navigation Links */}
-            <li className="nav-item">
+            <li className="nav-item" style={{fontFamily: 'Lora'}}>
               <Link className="nav-link" to="/">
                 Home
               </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/">
-                Trading Tips
+            <li className="nav-item"style={{fontFamily: 'Lora'}}>
+              <Link className="nav-link" to="/learning">
+                Learning Center
               </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/">
-                Support
-              </Link>
-            </li>
-            <li className="nav-item">
+            <li className="nav-item"style={{fontFamily: 'Lora'}}>
               <Link className="nav-link" to="/charts">
                 Charts
               </Link>
             </li>
             {/* Conditional rendering for Login/Logout */}
             {token ? (
-              <li className="nav-item">
+              <li className="nav-item"style={{fontFamily: 'Lora'}}>
         
                 <button className="btn btn-link nav-link" onClick={handleLogout}>
                   Logout
                 </button>
               </li>
             ) : (
-              <li className="nav-item">
+              <li className="nav-item"style={{fontFamily: 'Lora'}}>
                 <Link className="nav-link" to="/registration">
                   Login
                 </Link>

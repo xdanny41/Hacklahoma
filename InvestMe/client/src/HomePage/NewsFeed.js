@@ -52,7 +52,7 @@ function NewsFeed() {
 
     return (
         <div className="news-feed">
-            <h2 className="news-title">Top Trending Financial News</h2>
+            <h2 className="news-title" >Trending Financial News</h2>
             <ul className="news-list">
                 {currentArticles.map((article, index) => (
                     <li key={index} className="news-item">

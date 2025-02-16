@@ -66,7 +66,7 @@ function Feed() {
     <div className="container py-4">
       <div className="row justify-content-center">
         <div className="">
-          <h2 className="mb-4" style={{color:'white'}}>Feed</h2>
+          <h2 className="mb-4" style={{color:'white',fontFamily: 'Lora'}}>Feed</h2>
           <CreatePost onPostCreated={fetchPosts} />
           <div
             className="overflow-auto custom-scrollbar"
@@ -76,7 +76,7 @@ function Feed() {
               <div key={post._id} className="card mb-3">
                 <div className="card-body">
                   <div className="d-flex justify-content-between">
-                    <span className="fw-bold">
+                    <span className="fw-bold" style={{fontFamily:'Lora'}}>
                       {post.userId?.username || 'Unknown User'}
                     </span>
                     <small className="text-muted">
@@ -84,11 +84,11 @@ function Feed() {
                     </small>
                   </div>
                   <h5 className="mt-2">
-                    <a href={`/post/${post._id}`} className="text-decoration-none">
+                    <a href={`/post/${post._id}`} className="text-decoration-none" style={{fontFamily:'Lora'}}>
                       {post.title || 'Untitled Post'}
                     </a>
                   </h5>
-                  <p className="card-text">{post.content}</p>
+                  <p className="card-text" style={{fontFamily:'Lora'}}>{post.content}</p>
                   {post.mediaUrl && (
                     isVideo(post.mediaUrl) ? (
                       <video

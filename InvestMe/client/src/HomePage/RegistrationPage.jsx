@@ -62,8 +62,8 @@ function RegistrationPage() {
   return (
     <div className="container d-flex flex-column justify-content-center align-items-center vh-100">
       {/* Lottie Animation Section */}
-      <div className="mb-4" style={{ maxWidth: '300px' }}>
-        <h1>INVEST ME</h1>
+      <div className="mb-4" style={{ maxWidth: '300px', color:'white'}}>
+        <h1 style={{fontFamily:'Lora'}}>INVEST ME</h1>
       </div>
 
       <div className="mb-4" style={{ maxWidth: '300px' }}>

@@ -31,7 +31,6 @@ function PostThread() {
     }
   };
 
-  // Fetch comments for the post
   const fetchComments = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/api/posts/${id}/comments`);
@@ -47,7 +46,6 @@ function PostThread() {
     fetchComments();
   }, [id]);
 
-  // Handle submitting a new comment (for the main comment box)
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
@@ -81,10 +79,9 @@ function PostThread() {
     try {
       await axios.post(
         `http://localhost:5000/api/posts/${id}/comments`,
-        { comment: replyText, parentId }, // Include the parentId for a reply
+        { comment: replyText, parentId }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      // Clear the reply text for that comment
       setReplyState((prevState) => ({ ...prevState, [parentId]: '' }));
       fetchComments();
     } catch (error) {
@@ -93,7 +90,6 @@ function PostThread() {
     }
   };
 
-  // Handle sentiment analysis
   const handleAnalyzeSentiment = async () => {
     if (!post || !post.content) return;
     setSentimentLoading(true);
@@ -127,8 +123,8 @@ function PostThread() {
       {post ? (
         <div className="card mb-3">
           <div className="card-body">
-            <h3 className="card-title">{post.title || 'Untitled Post'}</h3>
-            <p className="card-text">{post.content}</p>
+            <h3 className="card-title" style={{fontFamily:'Lora'}}>{post.title || 'Untitled Post'}</h3>
+            <p className="card-text" style={{fontFamily:'Lora'}}>{post.content}</p>
             {post.mediaUrl && (
               post.mediaUrl.match(/\.(mp4|mov|webm|ogg)(\?.*)?$/i) ? (
                 <video
@@ -150,7 +146,7 @@ function PostThread() {
               </button>
               {sentimentError && <p className="text-danger mt-2">{sentimentError}</p>}
               {sentimentResult && (
-                <div className="alert alert-info mt-2">
+                <div className="alert alert-info mt-2" style={{fontFamily:'Lora'}}>
                   <strong>Sentiment Analysis:</strong> {sentimentResult}
                 </div>
               )}
@@ -158,7 +154,7 @@ function PostThread() {
           </div>
         </div>
       ) : (
-        <p className="text-center py-4">Post not found.</p>
+        <p className="text-center py-4" style={{fontFamily:'Lora'}}>Post not found.</p>
       )}
 
       <div className="card mb-3">
