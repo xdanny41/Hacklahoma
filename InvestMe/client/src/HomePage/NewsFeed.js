@@ -4,7 +4,9 @@ import './NewsFeed.css'; // Import external CSS file
 
 function NewsFeed() {
     const [news, setNews] = useState([]);
-    const API_KEY = 'nTlnKgjdI06vCcmTgSwpqpbXy7HDjmSOL4YvybAs'; // Replace with your MarketAux API key
+    const [currentPage, setCurrentPage] = useState(1);
+    const articlesPerPage = 5;
+    const API_KEY = process.env.REACT_APP_FINNHUB_API_KEY; // Replace with your MarketAux API key
 
     useEffect(() => {
         fetchNews();
@@ -12,75 +14,66 @@ function NewsFeed() {
 
     // Fetch news from the API and store it in localStorage
     const fetchNews = async () => {
-      const cachedNews = localStorage.getItem("newsData");
-      
-      if (cachedNews) {
-          setNews(JSON.parse(cachedNews));
-      } else {
-          try {
-              const response = await axios.get(`https://api.marketaux.com/v1/news/all`, {
-                  params: {
-                    api_token: API_KEY,
-                    symbols: 'AAPL,TSLA,GOOGL', // Example symbols
-                    countries: 'us',
-                    language: 'en',
-                    limit: 3 //Default basic plan is 3
-                   }
-              });
-              localStorage.setItem("newsData", JSON.stringify(response.data.data));
-              setNews(response.data.data);
-          } catch (error) {
-              console.error('Error fetching news:', error);
-          }
-      }
-  };
-
-  // Truncate title if it exceeds maxLength
-  const truncateTitle = (title, maxLength = 50) => {
-    return title.length > maxLength ? title.substring(0, maxLength) + "..." : title;
-  };
-
-  
-    // Uncomment the following function to new fetch news from the API
-  /*() USE THIS FOR ACTUAL API
-    const fetchNews = async () => {
         try {
-            const response = await axios.get(`https://api.marketaux.com/v1/news/all`, {
+            const response = await axios.get(`https://finnhub.io/api/v1/news`, {
                 params: {
-                  api_token: API_KEY,
-                  symbols: 'AAPL,TSLA,GOOGL', // Example symbols
-                  countries: 'us',
-                  language: 'en',
-                  sort: 'sentiment_avg',
-                  sort_order: 'asc',
-                  limit: 3 //Default basic plan is 3
+                    category: 'general', // Fetch general financial news
+                    token: API_KEY,
                 }
             });
-            setNews(response.data.data || []);
+            setNews(response.data);
         } catch (error) {
             console.error('Error fetching news:', error);
         }
-    };*/
+    };
+
+    // Truncate title if it exceeds maxLength
+    const truncateTitle = (title, maxLength = 50) => {
+        return title.length > maxLength ? title.substring(0, maxLength) + "..." : title;
+    };
+
+    // Adding pages to news feed
+    const indexOfLastArticle = currentPage * articlesPerPage;
+    const indexOfFirstArticle = indexOfLastArticle - articlesPerPage;
+    const currentArticles = news.slice(indexOfFirstArticle, indexOfLastArticle);
+    const totalPages = Math.ceil(news.length / articlesPerPage);
+
+    const nextPage = () => {
+        if (indexOfLastArticle < news.length) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const prevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
 
     return (
         <div className="news-feed">
             <h2 className="news-title">Top Trending Financial News</h2>
             <ul className="news-list">
-                {news.map((article, index) => (
+                {currentArticles.map((article, index) => (
                     <li key={index} className="news-item">
-                        <img className="news-image" src={article.image_url} alt={article.title} />
+                        <img className="news-image" src={article.image} alt={article.headline} />
                         <a 
                           className="news-link" 
                           href={article.url} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          title={article.title} // Full title appears on hover
+                          title={article.headline} // Full title appears on hover
                         >
-                          {truncateTitle(article.title, 50)}
+                          {truncateTitle(article.headline, 50)}
                         </a>
                     </li>
                 ))}
             </ul>
+            <div className="pagination-controls">
+                <button className="pagination-button" onClick={prevPage} disabled={currentPage === 1}>Previous</button>
+                <span className="pagination-text"> Page {currentPage} of {totalPages} </span>
+                <button className="pagination-button" onClick={nextPage} disabled={currentPage >= totalPages}>Next</button>
+            </div>
         </div>
     );
 }

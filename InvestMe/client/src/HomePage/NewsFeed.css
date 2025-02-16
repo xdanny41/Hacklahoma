@@ -1,11 +1,13 @@
-/* NewsFeed.css - Styles for the NewsFeed Component */
+/* NewsFeed.css - Styles for NewsFeed Component */
 
 .news-feed {
     width: 100%;
-    background-color: #ffffff;
+    max-width: 600px;
+    background-color: #fff;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
 }
 
 .news-title {
@@ -25,7 +27,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #ffffff;
+    background-color: #f9f9f9;
     padding: 15px;
     margin-bottom: 15px;
     border-radius: 8px;
@@ -55,4 +57,37 @@
 
 .news-link:hover {
     text-decoration: underline;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+    gap: 10px;
+}
+
+.pagination-button {
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background-color: #005bb5;
+}
+
+.pagination-text {
+    font-size: 1rem;
+    font-weight: bold;
 }
