@@ -1,0 +1,57 @@
+/* Improved Watchlist Styles */
+
+.watchlist {
+    width: 100%;
+    max-width: 500px; /* Increased width for better spacing */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+}
+
+.watchlist h2 {
+    text-align: center;
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+}
+
+.watchlist-table {
+    width: 100%;
+    border-spacing: 12px; /* Adds spacing between table elements */
+}
+
+.watchlist-table th, .watchlist-table td {
+    padding: 12px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.watchlist-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    border-radius: 6px;
+}
+
+.watchlist-table td {
+    background-color: #fafafa;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.company-name {
+    font-size: 0.85em;
+    color: #777;
+    display: block;
+    margin-top: 2px;
+}
+
+.price-change.up {
+    color: green;
+    font-weight: bold;
+}
+
+.price-change.down {
+    color: red;
+    font-weight: bold;
+}

@@ -1,5 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import NewsFeed from '../HomePage/NewsFeed';
+import Watchlist from '../HomePage/Watchlist';
 
 function LandingPage() {
   // Sample data to simulate “tweets” about stocks
@@ -22,39 +24,29 @@ function LandingPage() {
       content: 'Watch out for upcoming earnings on $NFLX. #FAANG',
       timestamp: '1h'
     },
-    // Add more sample data as needed...
   ];
 
   return (
     <div className="container-fluid vh-100">
-      {/* If you want a fixed top navbar, place it here */}
       <div className="row h-100">
-        
-        {/* LEFT SIDEBAR */}
-        <div className="col-2 bg-light d-flex flex-column align-items-start py-3">
+        {/* LEFT SIDEBAR WITH WATCHLIST */}
+        <div className="col-3 bg-light d-flex flex-column align-items-start py-3">
           <h4 className="mb-4">Logo/Brand</h4>
-          {/* Potential nav items, e.g. */}
           <nav className="nav flex-column">
-            <a className="nav-link active" href="#home">
-              Home
-            </a>
-            <a className="nav-link" href="#profile">
-              Profile
-            </a>
-            <a className="nav-link" href="#settings">
-              Settings
-            </a>
+            <a className="nav-link active" href="#home">Home</a>
+            <a className="nav-link" href="#profile">Profile</a>
+            <a className="nav-link" href="#settings">Settings</a>
           </nav>
+          <h6 className="mt-4"> </h6>
+          <Watchlist />
         </div>
         
         {/* CENTER FEED */}
-        <div className="col-8 border-start border-end" style={{ overflowY: 'auto' }}>
+        <div className="col-6 border-start border-end" style={{ overflowY: 'auto' }}>
           <div className="py-3 px-3">
             <h5>Home</h5>
           </div>
           <hr />
-          
-          {/* List of posts */}
           <div className="px-3">
             {samplePosts.map((post) => (
               <div key={post.id} className="mb-4">
@@ -69,23 +61,10 @@ function LandingPage() {
           </div>
         </div>
         
-        {/* RIGHT SIDEBAR */}
-        <div className="col-2 bg-light d-flex flex-column align-items-start py-3">
-          <h6 className="mb-3">Trending Stocks</h6>
-          <ul className="list-unstyled">
-            <li>
-              <a href="#AAPL" className="text-decoration-none">AAPL</a>
-            </li>
-            <li>
-              <a href="#TSLA" className="text-decoration-none">TSLA</a>
-            </li>
-            <li>
-              <a href="#AMZN" className="text-decoration-none">AMZN</a>
-            </li>
-            <li>
-              <a href="#NFLX" className="text-decoration-none">NFLX</a>
-            </li>
-          </ul>
+        {/* RIGHT SIDEBAR WITH NEWS FEED */}
+        <div className="col-3 bg-light d-flex flex-column align-items-start py-3">
+          <h6 className="mb-3"> </h6>
+          <NewsFeed />
         </div>
       </div>
     </div>
