@@ -9,11 +9,9 @@ function Portfolio() {
   const [positionData, setPositionData] = useState({
     tickerSymbol: '',
     shares: '',
-    dollarAmount: '',
     purchaseDate: '',
   });
 
-  // Fetch portfolio data on mount.
   useEffect(() => {
     fetchPortfolio();
   }, []);
@@ -33,61 +31,60 @@ function Portfolio() {
     }
   };
 
-  // Create or add funds to the portfolio.
-  const handleAddFunds = async () => {
+  const fetchStockPrice = async (ticker) => {
     try {
-      const token = localStorage.getItem('token');
-      const additionalFunds = parseFloat(balanceInput) || 0;
-      const res = await axios.put(
-        'http://localhost:5000/api/portfolio/add-funds',
-        { amount: additionalFunds },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setPortfolio(res.data.portfolio);
-    } catch (err) {
-      console.error('Error adding funds:', err);
-      setError('Error adding funds.');
+      const response = await axios.get(`https://finnhub.io/api/v1/quote`, {
+        params: {
+          symbol: ticker,
+          token: process.env.REACT_APP_FINNHUB_API_KEY,
+        },
+      });
+      return response.data.c || 0; // Ensure a valid number
+    } catch (error) {
+      console.error('Error fetching stock price:', error);
+      return 0;
     }
   };
 
-  // Handle input changes for position form.
-  const handlePositionInputChange = (e) => {
-    setPositionData({ ...positionData, [e.target.name]: e.target.value });
-  };
-
-  // Add a new position.
   const handleAddPosition = async () => {
     try {
       const token = localStorage.getItem('token');
-      const { tickerSymbol, shares, dollarAmount, purchaseDate } = positionData;
+      const { tickerSymbol, shares, purchaseDate } = positionData;
+
       if (!tickerSymbol || !purchaseDate) {
         setError('Ticker symbol and purchase date are required.');
         return;
       }
-      if (!shares && !dollarAmount) {
-        setError('Please provide either the number of shares or a dollar amount.');
+      if (!shares) {
+        setError('Please provide the number of shares.');
         return;
       }
+      
+      const stockPrice = await fetchStockPrice(tickerSymbol);
+      if (!stockPrice) {
+        setError('Could not fetch stock price. Try again later.');
+        return;
+      }
+      
+      const totalCost = stockPrice * parseFloat(shares);
+      if (portfolio.balance < totalCost) {
+        setError('Insufficient funds to purchase these shares.');
+        return;
+      }
+      
       const res = await axios.put(
         'http://localhost:5000/api/portfolio/add-position',
         {
           tickerSymbol,
-          // Send shares only if provided.
-          ...(shares && { shares: parseFloat(shares) }),
-          // Send dollarAmount only if provided.
-          ...(dollarAmount && { dollarAmount: parseFloat(dollarAmount) }),
-          purchaseDate, // expects an ISO date string
+          shares: parseFloat(shares),
+          purchaseDate,
+          dollarAmount: totalCost,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       setPortfolio(res.data.portfolio);
-      // Clear the form.
-      setPositionData({
-        tickerSymbol: '',
-        shares: '',
-        dollarAmount: '',
-        purchaseDate: '',
-      });
+      setPositionData({ tickerSymbol: '', shares: '', purchaseDate: '' });
     } catch (err) {
       console.error('Error adding position:', err);
       setError('Error adding position.');
@@ -112,21 +109,13 @@ function Portfolio() {
                 <ul className="list-group mb-3">
                   {portfolio.positions.map((position, idx) => (
                     <li key={idx} className="list-group-item">
-                      {position.tickerSymbol}:{" "}
-                      {position.dollarAmount !== undefined
-                        ? `$${position.dollarAmount.toFixed(2)}`
-                        : 'N/A'}
-                      {position.shares !== undefined && (
-                        <> ({position.shares} shares)</>
-                      )}{" "}
-                      invested (Purchased: {new Date(position.purchaseDate).toLocaleDateString()})
+                      {position.tickerSymbol}: {position.shares} shares - ${position.dollarAmount ? position.dollarAmount.toFixed(2) : 'N/A'} (Purchased: {new Date(position.purchaseDate).toLocaleDateString()})
                     </li>
                   ))}
                 </ul>
               ) : (
                 <p>No positions yet.</p>
               )}
-              {/* Add Funds Section */}
               <div className="mb-3">
                 <input
                   type="number"
@@ -136,10 +125,7 @@ function Portfolio() {
                   onChange={(e) => setBalanceInput(e.target.value)}
                 />
               </div>
-              <button className="btn btn-primary mb-4" onClick={handleAddFunds}>
-                Add Funds
-              </button>
-              {/* Add Position Section */}
+              <button className="btn btn-primary mb-4">Add Funds</button>
               <div className="card">
                 <div className="card-header">
                   <h5>Add New Position</h5>
@@ -152,7 +138,7 @@ function Portfolio() {
                       className="form-control"
                       placeholder="Ticker Symbol (e.g. AAPL)"
                       value={positionData.tickerSymbol}
-                      onChange={handlePositionInputChange}
+                      onChange={(e) => setPositionData({ ...positionData, tickerSymbol: e.target.value })}
                     />
                   </div>
                   <div className="mb-3">
@@ -160,19 +146,9 @@ function Portfolio() {
                       type="number"
                       name="shares"
                       className="form-control"
-                      placeholder="Number of Shares (optional)"
+                      placeholder="Number of Shares"
                       value={positionData.shares}
-                      onChange={handlePositionInputChange}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <input
-                      type="number"
-                      name="dollarAmount"
-                      className="form-control"
-                      placeholder="Dollar Amount to Invest (optional)"
-                      value={positionData.dollarAmount}
-                      onChange={handlePositionInputChange}
+                      onChange={(e) => setPositionData({ ...positionData, shares: e.target.value })}
                     />
                   </div>
                   <div className="mb-3">
@@ -181,7 +157,7 @@ function Portfolio() {
                       name="purchaseDate"
                       className="form-control"
                       value={positionData.purchaseDate}
-                      onChange={handlePositionInputChange}
+                      onChange={(e) => setPositionData({ ...positionData, purchaseDate: e.target.value })}
                     />
                   </div>
                   <button className="btn btn-success" onClick={handleAddPosition}>
@@ -191,21 +167,7 @@ function Portfolio() {
               </div>
             </>
           ) : (
-            <>
-              <p>No portfolio exists yet.</p>
-              <div className="mb-3">
-                <input
-                  type="number"
-                  className="form-control"
-                  placeholder="Enter initial balance"
-                  value={balanceInput}
-                  onChange={(e) => setBalanceInput(e.target.value)}
-                />
-              </div>
-              <button className="btn btn-success" onClick={handleAddFunds}>
-                Create Portfolio &amp; Add Funds
-              </button>
-            </>
+            <p>No portfolio exists yet.</p>
           )}
         </div>
       </div>
