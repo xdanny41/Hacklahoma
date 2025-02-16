@@ -1,7 +1,5 @@
- watchlist
 import logo from './logo.svg';
 import './App.css';
-import LandingPage from './HomePage/LandingPage';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AuthTest from './HomePage/AuthTest';
@@ -15,16 +13,14 @@ import Portfolio from './HomePage/UserPortfolio';
 function App() {
   return (
     <div>
-watchlist
       <LandingPage />
 
        <Router>
       <Routes>
-        <Route path="/" element={<Portfolio />} /> 
+      <Route path="/" element={<Feed />} /> 
         <Route path="/post/:id" element={<PostThread />} />
       </Routes>
     </Router>
-Development
     </div>
   );
 }
