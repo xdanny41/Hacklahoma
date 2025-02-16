@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { storage } from '../firebase';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function CreatePost({ onPostCreated }) {
   const [title, setTitle] = useState('');
@@ -12,7 +14,6 @@ function CreatePost({ onPostCreated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Log the title to verify it is being captured correctly.
     console.log('Submitting post with title:', title);
 
     try {
@@ -25,7 +26,6 @@ function CreatePost({ onPostCreated }) {
       setUploading(true);
       let mediaUrl = '';
 
-      // If a file is selected, upload it to Firebase Storage first.
       if (file) {
         const storageRef = ref(storage, `uploads/${Date.now()}-${file.name}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
@@ -44,11 +44,9 @@ function CreatePost({ onPostCreated }) {
         mediaUrl = await getDownloadURL(uploadTask.snapshot.ref);
       }
 
-      // Prepare the payload and ensure the title is included.
       const payload = { title, content, mediaUrl };
       console.log('Payload being sent:', payload);
 
-      // Send title, content, and mediaUrl to your back end.
       const response = await axios.post(
         'http://localhost:5000/api/posts',
         payload,
@@ -56,7 +54,6 @@ function CreatePost({ onPostCreated }) {
       );
 
       console.log('Post creation response:', response.data);
-      // Reset form fields after successful post
       setTitle('');
       setContent('');
       setFile(null);
@@ -74,50 +71,70 @@ function CreatePost({ onPostCreated }) {
   };
 
   return (
-    <div className="card mb-3">
-      <div className="card-body">
-        <h5 className="card-title">Create a Post</h5>
-        <form onSubmit={handleSubmit}>
-          {/* Title Input */}
-          <div className="mb-3">
-            <input
-              name="title"
-              type="text"
-              className="form-control"
-              placeholder="Post Title"
-              value={title}
-              onChange={(e) => {
-                setTitle(e.target.value);
-                console.log('Updated title:', e.target.value);
-              }}
-              required
-            />
-          </div>
-          {/* Content Input */}
-          <div className="mb-3">
-            <textarea
-              name="content"
-              className="form-control"
-              rows="3"
-              placeholder="Post Body"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              required
-            />
-          </div>
-          {/* File Upload */}
-          <div className="mb-3">
-            <input
-              type="file"
-              className="form-control"
-              accept="image/*,video/*"
-              onChange={handleFileChange}
-            />
-          </div>
-          <button type="submit" className="btn btn-primary" disabled={uploading}>
-            {uploading ? 'Uploading...' : 'Post'}
+    <div className="accordion mb-3" id="createPostAccordion">
+      <div className="accordion-item">
+        <h2 className="accordion-header" id="headingCreatePost">
+          <button
+            className="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseCreatePost"
+            aria-expanded="false"
+            aria-controls="collapseCreatePost"
+          >
+            Create a Post
           </button>
-        </form>
+        </h2>
+        <div
+          id="collapseCreatePost"
+          className="accordion-collapse collapse"
+          aria-labelledby="headingCreatePost"
+          data-bs-parent="#createPostAccordion"
+        >
+          <div className="accordion-body">
+            <form onSubmit={handleSubmit}>
+              {/* Title Input */}
+              <div className="mb-3">
+                <input
+                  name="title"
+                  type="text"
+                  className="form-control"
+                  placeholder="Post Title"
+                  value={title}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    console.log('Updated title:', e.target.value);
+                  }}
+                  required
+                />
+              </div>
+              {/* Content Input */}
+              <div className="mb-3">
+                <textarea
+                  name="content"
+                  className="form-control"
+                  rows="3"
+                  placeholder="Post Body"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  required
+                />
+              </div>
+              {/* File Upload */}
+              <div className="mb-3">
+                <input
+                  type="file"
+                  className="form-control"
+                  accept="image/*,video/*"
+                  onChange={handleFileChange}
+                />
+              </div>
+              <button type="submit" className="btn btn-primary" disabled={uploading}>
+                {uploading ? 'Uploading...' : 'Post'}
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   );

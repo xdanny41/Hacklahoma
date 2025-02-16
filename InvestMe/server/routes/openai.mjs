@@ -19,9 +19,8 @@ router.post('/analyze', async (req, res) => {
 
 Provide a brief sentiment summary and a plain language explanation.`;
 
-    // Use chat completion instead of regular completions
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4', // Ensure you're using the correct model identifier
+      model: 'gpt-4',
       messages: [
         { role: 'user', content: prompt },
       ],

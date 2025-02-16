@@ -1,0 +1,9 @@
+.feed {
+    width: 100%;
+    min-width: 50000px !important; /* Increased width for better spacing */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+}
