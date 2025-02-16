@@ -29,14 +29,18 @@ const upload = multer({ storage: storage });
 */
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { content, mediaUrl } = req.body;
-    if (!content) {
-      return res.status(400).json({ error: 'Content is required' });
+    // Destructure title, content, and mediaUrl from the request body.
+    const { title, content, mediaUrl } = req.body;
+
+    // Validate that both title and content are provided.
+    if (!title || !content) {
+      return res.status(400).json({ error: 'Title and content are required' });
     }
 
     // Create the post using the user ID provided by authMiddleware.
     const newPost = new Post({
       userId: req.user.userId, // Ensure authMiddleware sets req.user.userId
+      title,                   // Include title in the new post
       content,
       mediaUrl
     });
@@ -54,20 +58,19 @@ router.post('/', authMiddleware, async (req, res) => {
    Increments the "likes" count by 1.
 */
 router.post('/:id/like', authMiddleware, async (req, res) => {
-    try {
-      const post = await Post.findById(req.params.id);
-      if (!post) return res.status(404).json({ error: 'Post not found' });
-      
-      post.likes = (post.likes || 0) + 1;
-      await post.save();
-      
-      res.status(200).json({ message: 'Post liked', likes: post.likes });
-    } catch (error) {
-      console.error('Error in /:id/like route:', error);
-      res.status(500).json({ error: 'Server error' });
-    }
-  });
-  
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
+    post.likes = (post.likes || 0) + 1;
+    await post.save();
+
+    res.status(200).json({ message: 'Post liked', likes: post.likes });
+  } catch (error) {
+    console.error('Error in /:id/like route:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 /* 
    GET all posts 
@@ -85,46 +88,46 @@ router.get('/', async (req, res) => {
 
 // GET a single post by ID
 router.get('/:id', async (req, res) => {
-    try {
-      // Find the post by its ID and populate user info if needed.
-      const post = await Post.findById(req.params.id).populate('userId', 'username');
-      if (!post) {
-        return res.status(404).json({ error: 'Post not found' });
-      }
-      res.json(post);
-    } catch (error) {
-      console.error('Error fetching post by ID:', error);
-      res.status(500).json({ error: 'Server error' });
+  try {
+    // Find the post by its ID and populate user info if needed.
+    const post = await Post.findById(req.params.id).populate('userId', 'username');
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
     }
-  });
-  
+    res.json(post);
+  } catch (error) {
+    console.error('Error fetching post by ID:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
-// Add comment to a post
+/* 
+   Add comment to a post
+*/
 router.post('/:id/comments', authMiddleware, async (req, res) => {
-    try {
-      const { comment } = req.body;
-      const post = await Post.findById(req.params.id);
-      if (!post) return res.status(404).json({ error: 'Post not found' });
-      post.comments.push({ userId: req.user.userId, comment });
-      await post.save();
-      res.status(201).json({ message: 'Comment added', comments: post.comments });
-    } catch (error) {
-      console.error('Error adding comment:', error);
-      res.status(500).json({ error: 'Server error' });
-    }
-  });
-  
-  // Get comments for a post
-  router.get('/:id/comments', async (req, res) => {
-    try {
-      const post = await Post.findById(req.params.id).populate('comments.userId', 'username');
-      if (!post) return res.status(404).json({ error: 'Post not found' });
-      res.json(post.comments);
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-      res.status(500).json({ error: 'Server error' });
-    }
-  });
-  
+  try {
+    const { comment } = req.body;
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    post.comments.push({ userId: req.user.userId, comment });
+    await post.save();
+    res.status(201).json({ message: 'Comment added', comments: post.comments });
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Get comments for a post
+router.get('/:id/comments', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id).populate('comments.userId', 'username');
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    res.json(post.comments);
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 module.exports = router;

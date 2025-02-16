@@ -11,7 +11,7 @@ function App() {
     <div>
        <Router>
       <Routes>
-        <Route path="/" element={<Feed />} />
+        <Route path="/" element={<Feed />} /> 
         <Route path="/post/:id" element={<PostThread />} />
       </Routes>
     </Router>
