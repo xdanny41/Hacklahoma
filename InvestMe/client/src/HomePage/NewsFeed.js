@@ -6,7 +6,7 @@ function NewsFeed() {
     const [news, setNews] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const articlesPerPage = 5;
-    const API_KEY = 'cuoh6spr01qve8ptb120cuoh6spr01qve8ptb12g'; // Replace with your MarketAux API key
+    const API_KEY = process.env.REACT_APP_FINNHUB_API_KEY; // Replace with your MarketAux API key
 
     useEffect(() => {
         fetchNews();
