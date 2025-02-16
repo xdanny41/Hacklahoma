@@ -16,7 +16,7 @@ const MAGNIFICENT_7 = Object.keys(STOCK_NAMES);
 
 function Watchlist() {
     const [stockData, setStockData] = useState({});
-    const API_KEY = "cuoh6spr01qve8ptb120cuoh6spr01qve8ptb12g";
+    const API_KEY = process.env.REACT_APP_FINNHUB_API_KEY;
 
     const fetchStockPrices = useCallback(async () => {
         try {
