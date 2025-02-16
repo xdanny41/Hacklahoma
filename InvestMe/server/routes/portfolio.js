@@ -105,6 +105,52 @@ router.put('/add-position', authMiddleware, async (req, res) => {
 });
 
 /*
+   Sell a position from the portfolio.
+   Expects in the request body:
+     - tickerSymbol (String)
+     - shares (Number)  // number of shares to sell (assumed to be the entire position for simplicity)
+     - saleAmount (Number) // total sale proceeds (e.g., current price * shares)
+     
+   This endpoint removes the sold position and adds the sale proceeds to the portfolio balance.
+   Endpoint: PUT /api/portfolio/sell-position
+*/
+router.put('/sell-position', authMiddleware, async (req, res) => {
+  try {
+    const { tickerSymbol, shares, saleAmount } = req.body;
+    if (!tickerSymbol || !shares || !saleAmount) {
+      return res.status(400).json({ error: 'tickerSymbol, shares, and saleAmount are required.' });
+    }
+    
+    let portfolio = await Portfolio.findOne({ userId: req.user.userId });
+    if (!portfolio) {
+      return res.status(404).json({ error: 'Portfolio not found.' });
+    }
+    
+    // Find the position index by matching ticker and shares.
+    // (For simplicity, we assume an exact match. For partial sales, adjust accordingly.)
+    const posIndex = portfolio.positions.findIndex(pos => 
+      pos.tickerSymbol === tickerSymbol.toUpperCase() &&
+      Number(pos.shares) === Number(shares)
+    );
+    
+    if (posIndex === -1) {
+      return res.status(404).json({ error: 'Position not found for sale.' });
+    }
+    
+    // Remove the position from the portfolio.
+    portfolio.positions.splice(posIndex, 1);
+    // Add the sale proceeds to the portfolio balance.
+    portfolio.balance += parseFloat(saleAmount);
+    
+    await portfolio.save();
+    res.status(200).json({ portfolio });
+  } catch (error) {
+    console.error('Error selling position:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+/*
    (Optional) Get the current portfolio.
    Endpoint: GET /api/portfolio
 */

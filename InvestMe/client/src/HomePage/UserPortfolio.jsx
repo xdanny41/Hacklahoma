@@ -11,11 +11,13 @@ function Portfolio() {
     shares: '',
     purchaseDate: '',
   });
+  const [currentPrice, setCurrentPrice] = useState(null); // New state for current stock price
 
   useEffect(() => {
     fetchPortfolio();
   }, []);
 
+  // Fetch the user's portfolio from the back end
   const fetchPortfolio = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -31,6 +33,7 @@ function Portfolio() {
     }
   };
 
+  // Fetch the current stock price from Finnhub
   const fetchStockPrice = async (ticker) => {
     try {
       const response = await axios.get(`https://finnhub.io/api/v1/quote`, {
@@ -39,12 +42,25 @@ function Portfolio() {
           token: process.env.REACT_APP_FINNHUB_API_KEY,
         },
       });
-      return response.data.c || 0; // Ensure a valid number
+      return response.data.c || 0; // Use the current price or 0 if not available
     } catch (error) {
       console.error('Error fetching stock price:', error);
       return 0;
     }
   };
+
+  // Update current price whenever the tickerSymbol changes (if not empty)
+  useEffect(() => {
+    async function updatePrice() {
+      if (positionData.tickerSymbol.trim() !== '') {
+        const price = await fetchStockPrice(positionData.tickerSymbol);
+        setCurrentPrice(price);
+      } else {
+        setCurrentPrice(null);
+      }
+    }
+    updatePrice();
+  }, [positionData.tickerSymbol]);
 
   const handleAddPosition = async () => {
     try {
@@ -85,9 +101,44 @@ function Portfolio() {
 
       setPortfolio(res.data.portfolio);
       setPositionData({ tickerSymbol: '', shares: '', purchaseDate: '' });
+      setCurrentPrice(null);
+      setError('');
     } catch (err) {
       console.error('Error adding position:', err);
       setError('Error adding position.');
+    }
+  };
+
+  // New function to sell a position
+  const handleSellPosition = async (positionIndex) => {
+    try {
+      const token = localStorage.getItem('token');
+      const position = portfolio.positions[positionIndex];
+      if (!position) return;
+      
+      const currentPrice = await fetchStockPrice(position.tickerSymbol);
+      if (!currentPrice) {
+        setError('Could not fetch stock price. Try again later.');
+        return;
+      }
+      
+      const saleProceeds = currentPrice * position.shares;
+      
+      const res = await axios.put(
+        'http://localhost:5000/api/portfolio/sell-position',
+        {
+          tickerSymbol: position.tickerSymbol,
+          shares: position.shares,
+          saleAmount: saleProceeds,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setPortfolio(res.data.portfolio);
+      setError('');
+    } catch (err) {
+      console.error('Error selling position:', err);
+      setError('Error selling position.');
     }
   };
 
@@ -108,8 +159,17 @@ function Portfolio() {
               {portfolio.positions && portfolio.positions.length > 0 ? (
                 <ul className="list-group mb-3">
                   {portfolio.positions.map((position, idx) => (
-                    <li key={idx} className="list-group-item">
-                      {position.tickerSymbol}: {position.shares} shares - ${position.dollarAmount ? position.dollarAmount.toFixed(2) : 'N/A'} (Purchased: {new Date(position.purchaseDate).toLocaleDateString()})
+                    <li key={idx} className="list-group-item d-flex justify-content-between align-items-center">
+                      <div>
+                        {position.tickerSymbol}: {position.shares} shares - $
+                        {position.dollarAmount ? position.dollarAmount.toFixed(2) : 'N/A'} (Purchased: {new Date(position.purchaseDate).toLocaleDateString()})
+                      </div>
+                      <button 
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleSellPosition(idx)}
+                      >
+                        Sell
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -140,6 +200,12 @@ function Portfolio() {
                       value={positionData.tickerSymbol}
                       onChange={(e) => setPositionData({ ...positionData, tickerSymbol: e.target.value })}
                     />
+                    {/* Display current price if available */}
+                    {currentPrice !== null && (
+                      <small className="text-muted">
+                        Current Price: ${currentPrice.toFixed(2)}
+                      </small>
+                    )}
                   </div>
                   <div className="mb-3">
                     <input
@@ -150,6 +216,12 @@ function Portfolio() {
                       value={positionData.shares}
                       onChange={(e) => setPositionData({ ...positionData, shares: e.target.value })}
                     />
+                    {/* Optionally, display the total cost if both price and shares are provided */}
+                    {currentPrice !== null && positionData.shares && (
+                      <small className="text-muted">
+                        Total Cost: ${(currentPrice * parseFloat(positionData.shares)).toFixed(2)}
+                      </small>
+                    )}
                   </div>
                   <div className="mb-3">
                     <input

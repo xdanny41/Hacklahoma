@@ -68,13 +68,13 @@ function Feed() {
   return (
     <div className="container py-4">
       <div className="row justify-content-center">
-        <div className="col-12 col-md-8 col-lg-6">
+        <div className="">
           <h2 className="mb-4">Feed</h2>
           {/* Render the CreatePost component above the feed */}
           <CreatePost onPostCreated={fetchPosts} />
           <div
             className="overflow-auto custom-scrollbar"
-            style={{ maxHeight: '70vh', paddingRight: '1rem' }}
+            style={{ maxHeight: '155vh', paddingRight: '1rem' }}
           >
             {posts.map((post) => (
               <div key={post._id} className="card mb-3">
