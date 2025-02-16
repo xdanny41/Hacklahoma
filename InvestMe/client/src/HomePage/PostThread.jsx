@@ -13,6 +13,11 @@ function PostThread() {
   const [error, setError] = useState(null);
   const [commentLoading, setCommentLoading] = useState(false);
 
+  // New state for sentiment analysis
+  const [sentimentResult, setSentimentResult] = useState('');
+  const [sentimentLoading, setSentimentLoading] = useState(false);
+  const [sentimentError, setSentimentError] = useState('');
+
   // Fetch the full post details
   const fetchPost = async () => {
     try {
@@ -92,6 +97,22 @@ function PostThread() {
     }
   };
 
+  // Handle sentiment analysis
+  const handleAnalyzeSentiment = async () => {
+    if (!post || !post.content) return;
+    setSentimentLoading(true);
+    setSentimentError('');
+    try {
+      const res = await axios.post('http://localhost:5000/api/openai/analyze', { text: post.content });
+      setSentimentResult(res.data.result);
+    } catch (error) {
+      console.error('Error analyzing sentiment:', error);
+      setSentimentError('Error analyzing sentiment. Please try again.');
+    } finally {
+      setSentimentLoading(false);
+    }
+  };
+
   // Helper to toggle the reply form for a comment
   const toggleReplyForm = (commentId) => {
     setReplyState((prevState) => ({
@@ -104,8 +125,7 @@ function PostThread() {
   // For simplicity, we'll assume comments with no parentId are top-level,
   // and replies have a parentId matching a top-level comment's _id.
   const topLevelComments = comments.filter((c) => !c.parentId);
-  const getReplies = (commentId) =>
-    comments.filter((c) => c.parentId === commentId);
+  const getReplies = (commentId) => comments.filter((c) => c.parentId === commentId);
 
   if (loadingPost) return <p className="text-center py-4">Loading post...</p>;
   if (error) return <p className="text-center text-danger py-4">{error}</p>;
@@ -132,6 +152,18 @@ function PostThread() {
                 />
               )
             )}
+            {/* Analyze Sentiment Button */}
+            <div className="mt-3">
+              <button className="btn btn-secondary" onClick={handleAnalyzeSentiment} disabled={sentimentLoading}>
+                {sentimentLoading ? 'Analyzing...' : 'Analyze Sentiment'}
+              </button>
+              {sentimentError && <p className="text-danger mt-2">{sentimentError}</p>}
+              {sentimentResult && (
+                <div className="alert alert-info mt-2">
+                  <strong>Sentiment Analysis:</strong> {sentimentResult}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ) : (
@@ -162,56 +194,55 @@ function PostThread() {
         <div className="card-body">
           <h5 className="mb-3">Comments</h5>
           {topLevelComments.length > 0 ? (
-  topLevelComments.map((cmt) => (
-    <div key={cmt._id} className="mb-3">
-      <div>
-        <strong>{cmt.userId?.username || 'Anonymous'}: </strong>
-        {cmt.comment}
-      </div>
-      <button
-        className="btn btn-sm btn-link"
-        onClick={() => toggleReplyForm(cmt._id)}
-      >
-        Reply
-      </button>
-      {/* If a reply form is toggled open for this comment */}
-      {replyState.hasOwnProperty(cmt._id) && (
-        <form
-          onSubmit={(e) => handleReplySubmit(e, cmt._id)}
-          className="mt-2 ms-4"  // Indented reply form
-        >
-          <div className="mb-2">
-            <textarea
-              className="form-control form-control-sm"
-              placeholder="Write a reply..."
-              value={replyState[cmt._id]}
-              onChange={(e) =>
-                setReplyState((prevState) => ({
-                  ...prevState,
-                  [cmt._id]: e.target.value
-                }))
-              }
-              required
-            />
-          </div>
-          <button type="submit" className="btn btn-sm btn-primary">
-            Post Reply
-          </button>
-        </form>
-      )}
-      {/* Display replies for this comment, indented */}
-      {getReplies(cmt._id).map((reply) => (
-        <div key={reply._id} className="ms-4 mt-2" style={{ borderLeft: '2px solid #eee', paddingLeft: '10px' }}>
-          <strong>{reply.userId?.username || 'Anonymous'}: </strong>
-          {reply.comment}
-        </div>
-      ))}
-    </div>
-  ))
-) : (
-  <p className="text-muted">No comments yet.</p>
-)}
-
+            topLevelComments.map((cmt) => (
+              <div key={cmt._id} className="mb-3">
+                <div>
+                  <strong>{cmt.userId?.username || 'Anonymous'}: </strong>
+                  {cmt.comment}
+                </div>
+                <button
+                  className="btn btn-sm btn-link"
+                  onClick={() => toggleReplyForm(cmt._id)}
+                >
+                  Reply
+                </button>
+                {/* If a reply form is toggled open for this comment */}
+                {replyState.hasOwnProperty(cmt._id) && (
+                  <form
+                    onSubmit={(e) => handleReplySubmit(e, cmt._id)}
+                    className="mt-2 ms-4"  // Indented reply form
+                  >
+                    <div className="mb-2">
+                      <textarea
+                        className="form-control form-control-sm"
+                        placeholder="Write a reply..."
+                        value={replyState[cmt._id]}
+                        onChange={(e) =>
+                          setReplyState((prevState) => ({
+                            ...prevState,
+                            [cmt._id]: e.target.value
+                          }))
+                        }
+                        required
+                      />
+                    </div>
+                    <button type="submit" className="btn btn-sm btn-primary">
+                      Post Reply
+                    </button>
+                  </form>
+                )}
+                {/* Display replies for this comment, indented */}
+                {getReplies(cmt._id).map((reply) => (
+                  <div key={reply._id} className="ms-4 mt-2" style={{ borderLeft: '2px solid #eee', paddingLeft: '10px' }}>
+                    <strong>{reply.userId?.username || 'Anonymous'}: </strong>
+                    {reply.comment}
+                  </div>
+                ))}
+              </div>
+            ))
+          ) : (
+            <p className="text-muted">No comments yet.</p>
+          )}
         </div>
       </div>
     </div>

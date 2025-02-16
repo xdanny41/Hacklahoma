@@ -2,18 +2,12 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../CSS/Feed.css';
+import CreatePost from './Createpost'; // Import the CreatePost component
 
 function Feed() {
   const [posts, setPosts] = useState([]);
 
-  useEffect(() => {
-    fetchPosts();
-    const interval = setInterval(() => {
-      fetchPosts();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
+  // Fetch posts from the back end
   const fetchPosts = async () => {
     try {
       const res = await axios.get('http://localhost:5000/api/posts');
@@ -27,10 +21,18 @@ function Feed() {
     }
   };
 
+  useEffect(() => {
+    fetchPosts();
+    const interval = setInterval(() => {
+      fetchPosts();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   const isVideo = (url) => {
     if (!url) return false;
     const videoExtensions = ['.mp4', '.mov', '.webm', '.ogg'];
-    return videoExtensions.some(ext => url.toLowerCase().includes(ext));
+    return videoExtensions.some((ext) => url.toLowerCase().includes(ext));
   };
 
   const handleLike = async (postId) => {
@@ -68,6 +70,8 @@ function Feed() {
       <div className="row justify-content-center">
         <div className="col-12 col-md-8 col-lg-6">
           <h2 className="mb-4">Feed</h2>
+          {/* Render the CreatePost component above the feed */}
+          <CreatePost onPostCreated={fetchPosts} />
           <div
             className="overflow-auto custom-scrollbar"
             style={{ maxHeight: '70vh', paddingRight: '1rem' }}
