@@ -4,10 +4,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/auth'); // Path to your auth.js file
+const postRoutes = require('./routes/post');
+
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/api/posts', postRoutes); 
+app.use('/uploads', express.static('uploads'));
+
 
 // Connect to MongoDB (Atlas)
 mongoose.connect(process.env.MONGO_URI, {
