@@ -5,12 +5,15 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/auth'); // Path to your auth.js file
 const postRoutes = require('./routes/post');
-
+const portfolioRouter = require('./routes/portfolio');
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 app.use('/api/posts', postRoutes);
 app.use('/uploads', express.static('uploads'));
+app.use('/api/portfolio', portfolioRouter);
+
 
 // Dynamically import the OpenAI route (ES module) and mount it at /api/openai
 import('./routes/openai.mjs')

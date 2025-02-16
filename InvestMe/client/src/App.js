@@ -9,7 +9,8 @@ import LandingPage from './HomePage/LandingPage';
 import Feed from './HomePage/Feed';
 import Createpost from './HomePage/Createpost';
 import PostThread from './HomePage/PostThread'; // Adjust the path accordingly
- Development
+import Portfolio from './HomePage/UserPortfolio';
+
 
 function App() {
   return (
@@ -19,7 +20,7 @@ watchlist
 
        <Router>
       <Routes>
-        <Route path="/" element={<Feed />} /> 
+        <Route path="/" element={<Portfolio />} /> 
         <Route path="/post/:id" element={<PostThread />} />
       </Routes>
     </Router>
