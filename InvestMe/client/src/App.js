@@ -8,13 +8,14 @@ import Feed from './HomePage/Feed';
 import Createpost from './HomePage/Createpost';
 import PostThread from './HomePage/PostThread'; // Adjust the path accordingly
 import Portfolio from './HomePage/UserPortfolio';
+import CompanyPage from './HomePage/CompanyPage';
 
 
 function App() {
   return (
     <div>
       <LandingPage />
-
+    <CompanyPage></CompanyPage>
        <Router>
       <Routes>
       <Route path="/" element={<Feed />} /> 
