@@ -2,16 +2,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../CSS/Feed.css';
-import CreatePost from './Createpost'; // Import the CreatePost component
+import CreatePost from './Createpost'; 
 
 function Feed() {
   const [posts, setPosts] = useState([]);
 
-  // Fetch posts from the back end
   const fetchPosts = async () => {
     try {
       const res = await axios.get('http://localhost:5000/api/posts');
-      // Sort posts so the latest appear at the top.
       const sortedPosts = res.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
@@ -47,7 +45,6 @@ function Feed() {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      // Refresh posts to update like count.
       fetchPosts();
     } catch (error) {
       console.error('Error liking post:', error);
@@ -69,8 +66,7 @@ function Feed() {
     <div className="container py-4">
       <div className="row justify-content-center">
         <div className="">
-          <h2 className="mb-4">Feed</h2>
-          {/* Render the CreatePost component above the feed */}
+          <h2 className="mb-4" style={{color:'white'}}>Feed</h2>
           <CreatePost onPostCreated={fetchPosts} />
           <div
             className="overflow-auto custom-scrollbar"
@@ -79,7 +75,6 @@ function Feed() {
             {posts.map((post) => (
               <div key={post._id} className="card mb-3">
                 <div className="card-body">
-                  {/* User Info and Timestamp */}
                   <div className="d-flex justify-content-between">
                     <span className="fw-bold">
                       {post.userId?.username || 'Unknown User'}
@@ -88,15 +83,12 @@ function Feed() {
                       {new Date(post.createdAt).toLocaleString()}
                     </small>
                   </div>
-                  {/* Clickable Title */}
                   <h5 className="mt-2">
                     <a href={`/post/${post._id}`} className="text-decoration-none">
                       {post.title || 'Untitled Post'}
                     </a>
                   </h5>
-                  {/* Post Body */}
                   <p className="card-text">{post.content}</p>
-                  {/* Media (Image/Video) */}
                   {post.mediaUrl && (
                     isVideo(post.mediaUrl) ? (
                       <video
@@ -112,7 +104,6 @@ function Feed() {
                       />
                     )
                   )}
-                  {/* Like and Share Buttons */}
                   <div className="d-flex justify-content-around mt-3">
                     <button
                       className="btn btn-sm btn-outline-primary"

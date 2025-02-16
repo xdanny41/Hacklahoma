@@ -9,18 +9,29 @@ import PostThread from './HomePage/PostThread'; // Adjust the path accordingly
 import Portfolio from './HomePage/UserPortfolio';
 import CompanyPage from './HomePage/CompanyPage';
 import Navbar from './HomePage/navbar';
-
+import RegistrationPage from './HomePage/RegistrationPage';
 
 function App() {
   return (
-    <div>
-
+    <div style={{backgroundColor:'#001f3f'}}>
        <Router>
        <Navbar></Navbar>
-       <LandingPage />
       <Routes>
-      <Route path="/" element={<Feed />} /> 
+        {/* Landing page */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Registration/Login page */}
+        <Route path="/registration" element={<RegistrationPage />} />
+
+        {/* User Portfolio page */}
+        <Route path="/user-portfolio" element={<Portfolio />} />
+
+        {/* Threads page for a specific post, postId is passed as a URL parameter */}
         <Route path="/post/:id" element={<PostThread />} />
+
+        <Route path="/charts" element={<CompanyPage />} />
+
+
       </Routes>
     </Router>
     </div>

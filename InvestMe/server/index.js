@@ -1,9 +1,8 @@
-// server/index.js
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const authRoutes = require('./routes/auth'); // Path to your auth.js file
+const authRoutes = require('./routes/auth'); 
 const postRoutes = require('./routes/post');
 const portfolioRouter = require('./routes/portfolio');
 const app = express();
@@ -14,15 +13,15 @@ app.use('/api/posts', postRoutes);
 app.use('/uploads', express.static('uploads'));
 app.use('/api/portfolio', portfolioRouter);
 
-
-// Dynamically import the OpenAI route (ES module) and mount it at /api/openai
 import('./routes/openai.mjs')
   .then((openaiModule) => {
     app.use('/api/openai', openaiModule.default);
   })
   .catch((err) => console.error('Error loading OpenAI routes:', err));
 
-// Connect to MongoDB (Atlas)
+
+
+  //Mongo DB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -30,10 +29,8 @@ mongoose.connect(process.env.MONGO_URI, {
 .then(() => {
   console.log('Connected to MongoDB');
   
-  // Use the auth routes
   app.use('/api/auth', authRoutes);
 
-  // Test route
   app.get('/', (req, res) => {
     res.send('Server is up and running!');
   });

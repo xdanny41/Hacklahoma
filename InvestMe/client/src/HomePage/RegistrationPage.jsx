@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 // Import the Lottie player component
 import { Player } from '@lottiefiles/react-lottie-player';
+import animationData from '../Styling/Lottie1.json';
+
 
 function RegistrationPage() {
   const navigate = useNavigate();
@@ -68,7 +70,7 @@ function RegistrationPage() {
         <Player
           autoplay
           loop
-          src="./Lottie1.json" // Ensure this path points to your Lottie JSON file in the public folder.
+          src={animationData} // Ensure this path points to your Lottie JSON file in the public folder.
           style={{ height: '200px', width: '200px' }}
         />
       </div>

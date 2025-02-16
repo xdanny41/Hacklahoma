@@ -3,17 +3,14 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 function PostThread() {
-  const { id } = useParams(); // Extract the post ID from the URL
+  const { id } = useParams(); 
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
-  // replyState will track which comment (by its _id) is currently being replied to
-  const [replyState, setReplyState] = useState({}); // key: commentId, value: reply text
+  const [replyState, setReplyState] = useState({}); 
   const [loadingPost, setLoadingPost] = useState(true);
   const [error, setError] = useState(null);
   const [commentLoading, setCommentLoading] = useState(false);
-
-  // New state for sentiment analysis
   const [sentimentResult, setSentimentResult] = useState('');
   const [sentimentLoading, setSentimentLoading] = useState(false);
   const [sentimentError, setSentimentError] = useState('');
@@ -61,7 +58,7 @@ function PostThread() {
     try {
       await axios.post(
         `http://localhost:5000/api/posts/${id}/comments`,
-        { comment: newComment }, // no parentId means it's a top-level comment
+        { comment: newComment }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setNewComment('');
@@ -72,7 +69,6 @@ function PostThread() {
     }
   };
 
-  // Handle submitting a reply to a specific comment
   const handleReplySubmit = async (e, parentId) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
@@ -113,7 +109,6 @@ function PostThread() {
     }
   };
 
-  // Helper to toggle the reply form for a comment
   const toggleReplyForm = (commentId) => {
     setReplyState((prevState) => ({
       ...prevState,
@@ -121,9 +116,6 @@ function PostThread() {
     }));
   };
 
-  // Organize comments into a tree structure if using parentId
-  // For simplicity, we'll assume comments with no parentId are top-level,
-  // and replies have a parentId matching a top-level comment's _id.
   const topLevelComments = comments.filter((c) => !c.parentId);
   const getReplies = (commentId) => comments.filter((c) => c.parentId === commentId);
 
@@ -152,7 +144,6 @@ function PostThread() {
                 />
               )
             )}
-            {/* Analyze Sentiment Button */}
             <div className="mt-3">
               <button className="btn btn-secondary" onClick={handleAnalyzeSentiment} disabled={sentimentLoading}>
                 {sentimentLoading ? 'Analyzing...' : 'Analyze Sentiment'}
